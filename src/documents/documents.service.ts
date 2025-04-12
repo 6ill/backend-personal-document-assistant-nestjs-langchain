@@ -105,14 +105,18 @@ export class DocumentsService {
     }
 
     private async createCollection(userId: string, documentId:string): Promise<Collection> {
-        return await this.chromaClient.createCollection({
-            name:documentId,
-            embeddingFunction: new DefaultEmbeddingFunction(),
-            metadata: {
-                userId,
-                documentId
-            }   
-        })
+        try {
+            return await this.chromaClient.createCollection({
+                name:documentId,
+                embeddingFunction: new DefaultEmbeddingFunction(),
+                metadata: {
+                    userId,
+                    documentId
+                }   
+            })
+        } catch (error) {
+            throw new InternalServerErrorException('Server error!');
+        }
     }
 
     async listCollections(userId:string): Promise<any> {
