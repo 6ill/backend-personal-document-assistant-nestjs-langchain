@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -6,7 +6,6 @@ import { User } from 'src/common/decorators';
 import { UserSession } from 'src/common/interfaces';
 import { PDFFileValidationPipe } from './validators/pdf-file.validator';
 import { DocumentDto } from './dtos';
-import { ChatDto } from 'src/chats/dtos';
 
 @Controller('documents')
 @UseGuards(JwtGuard)
@@ -25,7 +24,8 @@ export class DocumentsController {
 
   @Get('list')
   async listDocuments(@User() user: UserSession) {
-    return await this.documentsService.listDocuments(user.userId)
+    const documents = await this.documentsService.listDocuments(user.userId);
+    return { documents }
   }
 
   @Post('delete')
@@ -35,12 +35,7 @@ export class DocumentsController {
 
   @Get('list-collections')
   async listCollections(@User() user: UserSession) {
-    return await this.documentsService.listCollections(user.userId)
-  }
-
-  @Post('test')
-  async getRelevantDocuments(@Body() {query, documentId}: ChatDto) {
-    const collection = await this.documentsService.getColletion(documentId)
-    return await this.documentsService.queryRelevantDocuments(query, collection)
+    const collections = await this.documentsService.listCollections(user.userId);
+    return { collections }
   }
 }

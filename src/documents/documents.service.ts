@@ -37,7 +37,6 @@ export class DocumentsService {
         if (!canUpload) {
             throw new BadRequestException('User has reached the maximum number of uploads.');
         }
-        console.log("setelah canUpload");
         let extractedText: string = '';
         const fileType = file.mimetype;
     
@@ -47,7 +46,6 @@ export class DocumentsService {
         } catch (error) {
             throw new BadRequestException('Error processing PDF document.');
         }
-        console.log("setelah parse");
         
         // Create new document record
         const doc = this.documentsRepository.create({
@@ -57,7 +55,6 @@ export class DocumentsService {
         });
         
         const savedDoc = await this.documentsRepository.save(doc);
-        console.log("setelah save");
 
         await this.processDocument(userId, savedDoc.id, extractedText);
         return { message: 'Document uploaded and procenpssed successfully'};
@@ -99,7 +96,6 @@ export class DocumentsService {
             nResults:3,
         });
         // const results = await collection.get({limit:10})
-        console.log("embedding function: ", collection.embeddingFunction);
         return results.documents;
     }
 
@@ -113,12 +109,10 @@ export class DocumentsService {
 
     private async processDocument(userId: string, documentId: string, extractedText: string) {
         const chunks = await this.splitTextIntoChunks(extractedText);
-        console.log("setelah split chunk");
 
         const chunkIds = chunks.map((_, index) => `chunk_${index}`);
        
         const collection = await this.createCollection(userId, documentId);
-        console.log("setelah create collection");
         await this.addEmbeddingsToCollection(collection, chunks, chunkIds);
     }
 
@@ -137,12 +131,12 @@ export class DocumentsService {
         }
     }
 
-    async listCollections(userId:string): Promise<any> {
+    async listCollections(userId:string): Promise<Collection[]> {
         const allCollections = await this.chromaClient.listCollectionsAndMetadata();
         const userCollections = allCollections.filter((collection) => {
             return collection.metadata.userId == userId;
         });
-        return userCollections;
+        return userCollections as Collection[];
     }
 
     private async addEmbeddingsToCollection(
@@ -155,7 +149,6 @@ export class DocumentsService {
                 ids: ids,
                 documents: texts, 
             });
-            console.log("setelah add embedding");
         } catch (error) {
             throw new InternalServerErrorException('Error adding embeddings to the collection.');
         }
