@@ -23,5 +23,6 @@ import { ConfigService } from '@nestjs/config';
       }
     }
   ],
+  exports: [DocumentsService]
 })
 export class DocumentsModule {}

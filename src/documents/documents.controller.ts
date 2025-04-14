@@ -6,6 +6,7 @@ import { User } from 'src/common/decorators';
 import { UserSession } from 'src/common/interfaces';
 import { PDFFileValidationPipe } from './validators/pdf-file.validator';
 import { DocumentDto } from './dtos';
+import { ChatDto } from 'src/chats/dtos';
 
 @Controller('documents')
 @UseGuards(JwtGuard)
@@ -35,5 +36,11 @@ export class DocumentsController {
   @Get('list-collections')
   async listCollections(@User() user: UserSession) {
     return await this.documentsService.listCollections(user.userId)
+  }
+
+  @Post('test')
+  async getRelevantDocuments(@Body() {query, documentId}: ChatDto) {
+    const collection = await this.documentsService.getColletion(documentId)
+    return await this.documentsService.queryRelevantDocuments(query, collection)
   }
 }

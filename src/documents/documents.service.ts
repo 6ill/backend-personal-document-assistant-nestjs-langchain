@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import * as pdfParse from 'pdf-parse'
 import { Payload } from 'src/common/interfaces';
 import { ConfigService } from '@nestjs/config';
-import { ChromaClient, Collection, DefaultEmbeddingFunction } from 'chromadb';
+import { ChromaClient, Collection, DefaultEmbeddingFunction, IncludeEnum } from 'chromadb';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { CollectionMetadata } from './interfaces';
 
@@ -93,6 +93,24 @@ export class DocumentsService {
         return { message: 'Document deleted successfully'}
     }
 
+    async queryRelevantDocuments(query: string, collection: Collection) {
+        const results = await collection.query({
+            queryTexts: query,
+            nResults:3,
+        });
+        // const results = await collection.get({limit:10})
+        console.log("embedding function: ", collection.embeddingFunction);
+        return results.documents;
+    }
+
+    async getColletion(documentId:string): Promise<Collection> {
+        try {
+            return await this.chromaClient.getCollection({name: documentId});
+        } catch (error) {
+            throw new BadRequestException('Document not found');
+        }
+    }
+
     private async processDocument(userId: string, documentId: string, extractedText: string) {
         const chunks = await this.splitTextIntoChunks(extractedText);
         console.log("setelah split chunk");
@@ -135,7 +153,7 @@ export class DocumentsService {
         try {
             await collection.add({
                 ids: ids,
-                documents: texts,
+                documents: texts, 
             });
             console.log("setelah add embedding");
         } catch (error) {
