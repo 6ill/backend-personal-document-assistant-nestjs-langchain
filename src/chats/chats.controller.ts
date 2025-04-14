@@ -27,4 +27,14 @@ export class ChatsController {
       response
     }
   }
+
+  @Post('stream')
+  async handleStreamingChat(@Body() chatDto: ChatDto, @User() user: UserSession) {
+    const collection = await this.documentsService.getColletion(chatDto.documentId);
+    if(collection.metadata.userId != user.userId) {
+      throw new UnauthorizedException('You are not authorized to access this collection.');
+    }
+
+    return this.chatsService.handleStreamingChat(chatDto, collection);
+  }
 }

@@ -26,4 +26,19 @@ export class ChatsService {
         
         return finalAnswer;
     }
+
+    async *handleStreamingChat(chatDto: ChatDto, collection: Collection): AsyncGenerator<string> {
+        const expandedQueries = await this.ollamaService.generateQueryExpansions(chatDto.query, 2);
+        let aggregatedResults = [];
+        for (const query of expandedQueries) {
+            const relevantDocs = await this.documentsService.queryRelevantDocuments(query, collection);
+            aggregatedResults = aggregatedResults.concat(relevantDocs);
+        }
+        const context = aggregatedResults.join('\n');
+        const finalPrompt = `Given the following document context:\n\n${context}\n\nPlease answer the question: "${chatDto.query}"`;
+  
+        for await (const chunk of this.ollamaService.generateStreamingResponse(finalPrompt)) {
+            yield chunk;
+        }
+    }
 }

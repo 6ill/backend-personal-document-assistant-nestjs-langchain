@@ -40,4 +40,15 @@ export class OllamaService {
             throw new InternalServerErrorException('Error processing response: ' + error.message);
         }
     }
+
+    async *generateStreamingResponse(prompt: string): AsyncGenerator<string> {
+        try {
+            const response = await this.ollamaClient.stream(prompt);
+            for await (const chunk of response) {
+                yield chunk.content as string;
+            }
+        } catch (error) {
+            throw new InternalServerErrorException('Error processing response: ' + error.message);
+        }
+    }
 }
