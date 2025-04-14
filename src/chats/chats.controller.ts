@@ -13,7 +13,6 @@ export class ChatsController {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly documentsService: DocumentsService,
-    private configService: ConfigService,
   ) {}
 
   @Post()

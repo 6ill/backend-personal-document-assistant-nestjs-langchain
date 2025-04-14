@@ -12,7 +12,6 @@ export class ChatsService {
     ) {}
 
     async handleChat(chatDto: ChatDto, collection: Collection): Promise<string> {
-        // const retrievedDocs = await this.documentsService.getRelevantDocuments(chatDto.query, collection)
         const expandedQueries = await this.ollamaService.generateQueryExpansions(chatDto.query, 2);
         let aggregatedResults = [];
         for (const query of expandedQueries) {
