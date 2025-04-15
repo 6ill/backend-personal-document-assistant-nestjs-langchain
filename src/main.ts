@@ -8,6 +8,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   app.setGlobalPrefix('/api/v1');
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors({origin: configService.get('REACT_APP_URL')})
   await app.listen(configService.get('NESTJS_PORT'));
 }
 bootstrap();
