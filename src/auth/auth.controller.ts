@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto, RegisterUserDto } from './dtos';
 import { JwtGuard } from './guard/jwt.guard';
@@ -15,6 +15,7 @@ export class AuthController {
     }
 
     @Post('signin')
+    @HttpCode(HttpStatus.OK)
     async signIn(@Body() loginUserDto: LoginUserDto) {
         const user = await this.authService.validateUser(loginUserDto);
         if (!user) {
