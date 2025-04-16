@@ -4,9 +4,7 @@ import { ChatDto } from './dtos';
 import { User } from 'src/common/decorators';
 import { UserSession } from 'src/common/interfaces';
 import { DocumentsService } from 'src/documents/documents.service';
-import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { Observable } from 'rxjs';
 import { Response } from 'express';
 
 @Controller('chats')
