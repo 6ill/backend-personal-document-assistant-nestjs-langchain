@@ -12,22 +12,21 @@ export class ChatsService {
     ) {}
 
     async handleChat(chatDto: ChatDto, collection: Collection): Promise<string> {
-        const expandedQueries = await this.ollamaService.generateQueryExpansions(chatDto.query, 2);
-        let aggregatedResults = [];
-        for (const query of expandedQueries) {
-            const relevantDocs = await this.documentsService.queryRelevantDocuments(query, collection);
-            aggregatedResults = aggregatedResults.concat(relevantDocs);
-        }
-        const context = aggregatedResults.join('\n');
-        const finalPrompt = `Given the following document context:\n\n${context}\n\nPlease answer the question: "${chatDto.query}"`;
-  
-        // Step 4: Get the final answer from the LLM (using Ollama, or through a dedicated LLM service).
-        const finalAnswer = await this.ollamaService.generateResponse(finalPrompt);
+        const prompt = await this.createExpandedQueryPrompt(chatDto, collection);
+        const finalAnswer = await this.ollamaService.generateResponse(prompt);
         
         return finalAnswer;
     }
 
     async *handleStreamingChat(chatDto: ChatDto, collection: Collection): AsyncGenerator<string> {
+        const prompt = await this.createExpandedQueryPrompt(chatDto, collection);
+  
+        for await (const chunk of this.ollamaService.generateStreamingResponse(prompt)) {
+            yield chunk;
+        }
+    }
+
+    private async createExpandedQueryPrompt(chatDto: ChatDto, collection: Collection): Promise<string> {
         const expandedQueries = await this.ollamaService.generateQueryExpansions(chatDto.query, 2);
         let aggregatedResults = [];
         for (const query of expandedQueries) {
@@ -36,9 +35,7 @@ export class ChatsService {
         }
         const context = aggregatedResults.join('\n');
         const finalPrompt = `Given the following document context:\n\n${context}\n\nPlease answer the question: "${chatDto.query}"`;
-  
-        for await (const chunk of this.ollamaService.generateStreamingResponse(finalPrompt)) {
-            yield chunk;
-        }
+
+        return finalPrompt;
     }
 }
