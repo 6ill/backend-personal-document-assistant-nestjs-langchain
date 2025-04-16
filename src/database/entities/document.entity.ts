@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
+import { Message } from "./message.entity";
 
 @Entity({name: 'documents'})
 export class Doc {
@@ -17,4 +18,7 @@ export class Doc {
 
     @ManyToOne(() => User, (user) => user.docs, {onDelete: 'CASCADE'})
     user: User;
+
+    @OneToMany(() => Message, (message) => message.doc)
+    messages: Message[];
 }
