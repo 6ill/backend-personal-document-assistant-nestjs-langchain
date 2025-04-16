@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Doc } from "./document.entity";
 import { MessageRole } from "src/common/enums";
 
@@ -8,6 +8,7 @@ export class Message {
     id: string;
 
     @ManyToOne(() => Doc, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'doc_id'})
     doc: Doc;
 
     @Column()
