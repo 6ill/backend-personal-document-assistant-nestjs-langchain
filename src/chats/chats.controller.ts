@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, Sse, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { ChatDto } from './dtos';
 import { User } from 'src/common/decorators';
@@ -14,6 +14,18 @@ export class ChatsController {
     private readonly chatsService: ChatsService,
     private readonly documentsService: DocumentsService,
   ) {}
+
+  @Get(':documentId')
+  async getAllMessagesByDoc(@Param('documentId', ParseUUIDPipe) documentId: string, @User() user: UserSession) {
+    const document = await this.documentsService.getDocumentById(documentId)
+    if(document.user.id != user.userId) {
+      throw new UnauthorizedException('Document not found!')
+    }
+
+    const messages =  await this.chatsService.getAllMessagesByDoc(documentId);
+    return { messages }
+  }
+
 
   @Post()
   async handleChat(@Body() chatDto: ChatDto, @User() user: UserSession) {

@@ -32,6 +32,17 @@ export class DocumentsService {
         return count < 3;
     }
 
+    async getDocumentById(documentId:string): Promise<Doc> {
+        return await this.documentsRepository.findOne({
+            where: {
+                id: documentId
+            },
+            relations: {
+                user: true
+            }
+        });
+    }
+
     async uploadDocument(userId: string, file: Express.Multer.File): Promise<Payload> {
         const canUpload = await this.canUserUpload(userId);
         if (!canUpload) {
