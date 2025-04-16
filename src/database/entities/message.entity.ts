@@ -7,7 +7,7 @@ export class Message {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => Doc, (doc) => doc.messages, {onDelete: 'CASCADE'})
+    @ManyToOne(() => Doc, {onDelete: 'CASCADE'})
     doc: Doc;
 
     @Column()

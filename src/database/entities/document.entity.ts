@@ -18,7 +18,4 @@ export class Doc {
 
     @ManyToOne(() => User, (user) => user.docs, {onDelete: 'CASCADE'})
     user: User;
-
-    @OneToMany(() => Message, (message) => message.doc)
-    messages: Message[];
 }
