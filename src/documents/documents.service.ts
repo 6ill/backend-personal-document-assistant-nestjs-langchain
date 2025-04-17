@@ -112,7 +112,7 @@ export class DocumentsService {
 
     async getColletion(documentId:string): Promise<Collection> {
         try {
-            return await this.chromaClient.getCollection({name: documentId});
+            return await this.chromaClient.getCollection({name: documentId, embeddingFunction: new DefaultEmbeddingFunction()});
         } catch (error) {
             throw new BadRequestException('Document not found');
         }
