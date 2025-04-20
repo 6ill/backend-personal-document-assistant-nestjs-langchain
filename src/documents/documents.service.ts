@@ -58,7 +58,6 @@ export class DocumentsService {
             throw new BadRequestException('Error processing PDF document.');
         }
         
-        // Create new document record
         const doc = this.documentsRepository.create({
             filename: file.originalname,
             fileType,
@@ -106,7 +105,6 @@ export class DocumentsService {
             queryTexts: query,
             nResults:3,
         });
-        // const results = await collection.get({limit:10})
         return results.documents;
     }
 
